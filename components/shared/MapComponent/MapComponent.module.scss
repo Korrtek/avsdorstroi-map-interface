@@ -1,0 +1,9 @@
+.map {
+  height: 100%;
+  width: 100%;
+  min-height: 90dvh;
+  position: relative;
+  z-index: 1;
+  border-radius: var(--radius);
+  padding-left: 50px;
+}

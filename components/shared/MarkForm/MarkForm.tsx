@@ -5,16 +5,15 @@ import { Input } from '@/components/ui/Input/Input'
 import { Container } from '@/components/ui/Container/Container'
 import { Button } from '@/components/ui/Button/Button'
 import dynamic from 'next/dynamic'
-
-// библиотеке leaflet к глобальному обьекту window, поэтому отключили рендер на сервере 
+// Библиотеке leaflet требуется доступ к глобальному объекту window, 
+// поэтому отключили рендер на сервере
 const MapComponent = dynamic(() => import('../MapComponent/MapComponent'), {
-  ssr: false,
-  loading: () => <div className={styles.mapLoading}>Загрузка карты...</div>,
+  ssr: false, // Отключаю рендеринг на сервере
 })
 
+// Интерфейс пропсов компонента
 interface Props {
-  className?: string
-  initialData?: {
+  initialData?: { // Начальные данные формы
     name: string
     latitude: number
     longitude: number
@@ -23,13 +22,14 @@ interface Props {
     workingHours: string
     companyName: string
   }
-  onSave?: (data: FormData) => void
-  onLocationChange?: (lat: number, lng: number) => void
+  onSave?: (data: FormData) => void // Колбэк при сохранении
+  onLocationChange?: (lat: number, lng: number) => void // Колбэк при изменении местоположения
 }
 
+// Интерфейс данных формы
 interface FormData {
   name: string
-  latitude: string
+  latitude: string // Хранится как строка для удобства редактирования
   longitude: string
   email: string
   phone: string
@@ -37,122 +37,170 @@ interface FormData {
   companyName: string
 }
 
+// Экспорт компонента формы маркера
 export const MarkForm: React.FC<Props> = ({
-  className,
-  initialData = {
+  initialData = { // Значения по умолчанию для начальных данных
     name: '',
-    latitude: 58.002407,
+    latitude: 58.002407, // Координаты по умолчанию (Пермь)
     longitude: 56.260992,
     email: '',
     phone: '',
     workingHours: '',
     companyName: '',
   },
-  onLocationChange,
-  onSave,
+  onLocationChange, // Колбэк изменения локации
+  onSave, // Колбэк сохранения
 }) => {
+  // Мемоизация начальных данных формы
   const initialFormData = useMemo(
     () => ({
       name: initialData.name,
-      latitude: initialData.latitude.toString(),
+      latitude: initialData.latitude.toString(), // Преобразование числа в строку
       longitude: initialData.longitude.toString(),
       email: initialData.email,
       phone: initialData.phone,
       workingHours: initialData.workingHours,
       companyName: initialData.companyName,
     }),
-    [initialData],
+    [initialData], // Зависимость от initialData
   )
 
+  // Состояние данных формы
   const [formData, setFormData] = useState<FormData>(initialFormData)
+  
+  // Состояние позиции маркера на карте [широта, долгота]
   const [markerPosition, setMarkerPosition] = useState<[number, number]>([
     initialData.latitude,
     initialData.longitude,
   ])
   
+  // Состояние наличия несохраненных изменений
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  // Сброс формы при смене initialData
+  // Эффект для сброса формы при изменении initialData
   useEffect(() => {
-    setFormData(initialFormData)
-    setMarkerPosition([initialData.latitude, initialData.longitude])
-    setHasUnsavedChanges(false)
-  }, [initialFormData, initialData.latitude, initialData.longitude])
+    setFormData(initialFormData) // Обновление данных формы
+    setMarkerPosition([initialData.latitude, initialData.longitude]) // Обновление позиции маркера
+    setHasUnsavedChanges(false) // Сброс флага изменений
+  }, [initialFormData, initialData.latitude, initialData.longitude]) // Зависимости
 
-  // Проверка изменений
+  // Эффект для проверки изменений формы
   useEffect(() => {
     const changesExist =
-      JSON.stringify(initialFormData) !== JSON.stringify(formData)
-    setHasUnsavedChanges(changesExist)
-  }, [formData, initialFormData])
+      JSON.stringify(initialFormData) !== JSON.stringify(formData) // Сравнение объектов через JSON
+    setHasUnsavedChanges(changesExist) // Установка флага изменений
+  }, [formData, initialFormData]) // Зависимости
 
+  // Обработчик изменения полей ввода
   const handleInputChange = useCallback(
     (field: keyof FormData, value: string) => {
       const newFormData = {
-        ...formData,
-        [field]: value,
+        ...formData, // Копия текущих данных
+        [field]: value, // Обновление конкретного поля
       }
-      setFormData(newFormData)
+      setFormData(newFormData) // Обновление состояния
 
+      // Если изменены координаты, обновляем маркер
       if (field === 'latitude' || field === 'longitude') {
         const lat =
           field === 'latitude'
-            ? parseFloat(value)
+            ? parseFloat(value) // Преобразуем строку в число
             : parseFloat(newFormData.latitude)
         const lng =
           field === 'longitude'
             ? parseFloat(value)
             : parseFloat(newFormData.longitude)
 
+        // Проверка на валидность чисел
         if (!isNaN(lat) && !isNaN(lng)) {
-          setMarkerPosition([lat, lng])
-          onLocationChange?.(lat, lng)
+          setMarkerPosition([lat, lng]) // Обновление позиции маркера
+          onLocationChange?.(lat, lng) // Вызов колбэка если передан
         }
       }
     },
-    [formData, onLocationChange],
+    [formData, onLocationChange], // Зависимости
   )
 
+  // Обработчик клика по карте
   const handleMapClick = useCallback(
     (lat: number, lng: number) => {
       setFormData((prev) => ({
         ...prev,
-        latitude: lat.toFixed(6),
+        latitude: lat.toFixed(6), // Округление до 6 знаков после запятой
         longitude: lng.toFixed(6),
       }))
-      setMarkerPosition([lat, lng])
-      onLocationChange?.(lat, lng)
+      setMarkerPosition([lat, lng]) // Обновление позиции маркера
+      onLocationChange?.(lat, lng) // Вызов колбэка
     },
-    [onLocationChange],
+    [onLocationChange], // Зависимости
   )
 
+  // Валидация координат
   const validateCoordinates = () => {
-    const lat = parseFloat(formData.latitude)
+    const lat = parseFloat(formData.latitude) // Преобразование в число
     const lng = parseFloat(formData.longitude)
 
-    const isValidLat = !isNaN(lat) && lat >= -90 && lat <= 90
-    const isValidLng = !isNaN(lng) && lng >= -180 && lng <= 180
+    const isValidLat = !isNaN(lat) && lat >= -90 && lat <= 90 // Проверка диапазона широты
+    const isValidLng = !isNaN(lng) && lng >= -180 && lng <= 180 // Проверка диапазона долготы
 
-    return isValidLat && isValidLng
+    return isValidLat && isValidLng // Возврат результата проверки
   }
 
+//Валидация Email
+const validateEmail = (email: string): boolean => {
+    if (email === '') return true // Пустое поле допустимо
+    
+    // 1. Проверка наличие символа @
+    const atIndex = email.indexOf('@')
+    if (atIndex <= 0) return false // @ должен быть не в начале
+    
+    // 2. Проверка на локальную часть и домен
+    const localPart = email.substring(0, atIndex)
+    const domain = email.substring(atIndex + 1)
+    
+    // 3. Проверка что локальная часть не пустая
+    if (localPart.length === 0) return false
+    
+    // 4. Проверка что домен не пустой и содержит точку
+    if (domain.length === 0) return false
+    const dotIndex = domain.indexOf('.')
+    if (dotIndex <= 0) return false // Точка не должна быть в начале домена
+    
+    // 5. Проверка что после последней точки есть хотя бы 2 символа
+    const lastDotIndex = domain.lastIndexOf('.')
+    if (lastDotIndex === -1) return false
+    if (domain.length - lastDotIndex - 1 < 2) return false // Должно быть минимум 2 символа после последней точки
+    
+    return true
+  }
+
+// Валидация номера телефона, никогда не писал регулярки, взято с инета
+const validatePhone = (phone: string): boolean => {
+  return /^\+\d{11}$/.test(phone.trim())
+}
+
+  // Обработчик отправки формы
   const handleSubmit = () => {
-    if (validateCoordinates() && onSave) {
-      onSave(formData)
-      // После сохранения сбрасываем флаг изменений
-      setHasUnsavedChanges(false)
-    }
+  const isEmailValid = validateEmail(formData.email || '')
+  const isPhoneValid = validatePhone(formData.phone || '')
+  const isCoordsValid = validateCoordinates()
+  
+  if (isCoordsValid && isEmailValid && isPhoneValid && onSave) {
+    onSave(formData)
+    setHasUnsavedChanges(false)
   }
+}
 
-  const isValidCoords = validateCoordinates()
+  const isValidCoords = validateCoordinates() // Вычисление валидности координат
 
   return (
-    <Container>
-      <div className={`${styles.markForm} ${className || ''}`}>
-        <div className={styles.markFormWrapper}>
-          <div className={styles.markColumn}>
-            <div className={styles.title}>Настройка Метки</div>
+    <Container> {/* Контейнер для содержимого */}
+      <div className={styles.markForm }> {/* Основной контейнер формы */}
+        <div className={styles.markFormWrapper}> {/* Обертка для flex-расположения */}
+          <div className={styles.markColumn}> {/* Колонка с полями формы */}
+            <div className={styles.title}>Настройка Метки</div> {/* Заголовок */}
             
+            {/* Поле ввода названия */}
             <Input
               placeholder="Курьер №1"
               value={formData.name}
@@ -160,16 +208,17 @@ export const MarkForm: React.FC<Props> = ({
               onChange={(e) => handleInputChange('name', e.target.value)}
             />
 
+            {/* Секция координат */}
             <div className={styles.coordinateSection}>
-              <div className={styles.coordinateRow}>
-                <div className={styles.coordinateInput}>
+              <div className={styles.coordinateRow}> {/* Строка для двух полей координат */}
+                <div className={styles.coordinateInput}> {/* Контейнер для поля широты */}
                   <Input
                     placeholder="58.002407"
                     value={formData.latitude}
                     onChange={(e) =>
                       handleInputChange('latitude', e.target.value)
                     }
-                    error={
+                    error={ // Отображение ошибки при невалидных данных
                       !isValidCoords && formData.latitude !== ''
                         ? 'От -90 до 90'
                         : undefined
@@ -177,14 +226,14 @@ export const MarkForm: React.FC<Props> = ({
                     label="Широта"
                   />
                 </div>
-                <div className={styles.coordinateInput}>
+                <div className={styles.coordinateInput}> {/* Контейнер для поля долготы */}
                   <Input
                     placeholder="56.260992"
                     value={formData.longitude}
                     onChange={(e) =>
                       handleInputChange('longitude', e.target.value)
                     }
-                    error={
+                    error={ // Отображение ошибки при невалидных данных
                       !isValidCoords && formData.longitude !== ''
                         ? 'От -180 до 180'
                         : undefined
@@ -195,22 +244,28 @@ export const MarkForm: React.FC<Props> = ({
               </div>
             </div>
 
+            {/* Поле ввода email */}
             <Input
               placeholder="mail@example.com"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
               type="email"
               label="Email"
+              // Добавляем параметр для отображения ошибки, если компонент Input его поддерживает
+              error={formData.email && !validateEmail(formData.email) ? "Некорректный email" : undefined}
             />
 
+            {/* Поле ввода телефона */}
             <Input
               placeholder="Телефон +7(800)5553535"
               value={formData.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              type="tel"
+              type="tel" // Указание типа для мобильных устройств
               label="Телефон"
+              error={formData.phone && !validatePhone(formData.phone) ? "Некорректный номер" : undefined}
             />
 
+            {/* Поле ввода часов работы */}
             <Input
               placeholder="Пн-пт, 9:00 - 19:00"
               value={formData.workingHours}
@@ -219,6 +274,7 @@ export const MarkForm: React.FC<Props> = ({
               label="Часы работы"
             />
 
+            {/* Поле ввода названия компании */}
             <Input
               placeholder="ООО Название компании"
               value={formData.companyName}
@@ -226,28 +282,33 @@ export const MarkForm: React.FC<Props> = ({
               label="Название Компании"
             />
 
+            {/* Футер формы с кнопкой и сообщениями */}
             <div className={styles.formFooter}>
+              {/* Кнопка сохранения */}
               <Button
                 variant="primary"
-                disabled={!isValidCoords || !hasUnsavedChanges}
+                disabled={!isValidCoords || !hasUnsavedChanges} // Блокировка при невалидных данных или отсутствии изменений
                 onClick={handleSubmit}
                 className={styles.saveButton}
               >
                 Сохранить Метку
               </Button>
 
+              {/* Сообщение об ошибке координат */}
               {!isValidCoords && (
                 <div className={styles.errorMessage}>
                   Исправьте координаты для сохранения
                 </div>
               )}
 
+              {/* Сообщение о сохраненных изменениях */}
               {!hasUnsavedChanges && isValidCoords && (
                 <div className={styles.savedMessage}>
                   Все изменения сохранены
                 </div>
               )}
 
+              {/* Индикатор несохраненных изменений */}
               {hasUnsavedChanges && (
                 <div className={styles.unsavedIndicator}>
                   Есть несохраненные изменения
@@ -256,12 +317,14 @@ export const MarkForm: React.FC<Props> = ({
             </div>
           </div>
 
+          {/* Колонка с картой */}
           <div className={styles.mapWrapper}>
             <div className={styles.mapContainer}>
+              {/* Динамически загружаемый компонент карты */}
               <MapComponent
-                markerPosition={markerPosition}
-                onMapClick={handleMapClick}
-                zoom={15}
+                markerPosition={markerPosition} // Позиция маркера
+                onMapClick={handleMapClick} // Обработчик клика по карте
+                zoom={15} // Уровень приближения
               />
             </div>
           </div>

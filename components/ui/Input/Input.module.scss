@@ -22,15 +22,35 @@
   }
 }
 
+.labelContainer {
+  display: flex;
+}
+
+
 .label {
   font-size: 14px;
   font-weight: 500;
   border: 1px solid var(--border);
   background-color: var(--background);
   border-top-left-radius: var(--radius);
-  border-top-right-radius: var(--radius);
+  border-right: none;
   padding: 1px 2px 1px 10px;
   user-select: none;
   border-bottom: none;
   font-weight: 600;
+  width: 100%;
+}
+.error {
+  border-top-right-radius: var(--radius);
+  border-right: 1px solid var(--border);
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 1px 2px 1px 10px;
+  user-select: none;
+  font-weight: 600;
+  
+  color: var(--destructive);
+  width: 100%;
 }

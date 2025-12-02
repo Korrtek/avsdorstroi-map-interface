@@ -7,6 +7,7 @@ interface Props {
   label?: string // Добавили label
   error?: string
   type?: string
+  
 }
 // передаю как пропсы чтобы переиспользовать инпут
 export const Input: React.FC<Props> = ({
@@ -15,10 +16,14 @@ export const Input: React.FC<Props> = ({
   value,
   onChange,
   label,
+  error
 }) => {
   return (
     <div className={styles.inputWrapper}>
-      {label && <div className={styles.label}>{label}</div>}
+       <div className={styles.labelContainer}>
+        {label && <div className={styles.label}>{label}</div>}
+        {error && <div className={styles.error}>{error}</div>}
+      </div>
       <input
         type={type}
         placeholder={placeholder}

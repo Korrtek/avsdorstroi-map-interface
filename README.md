@@ -14,3 +14,4 @@ pnpm dev
 bun dev
 ```
 Откройте http://localhost:3000 в браузере, чтобы увидеть результат.
+Для просмотра посетите https://avsdoorstoi-map.netlify.app/

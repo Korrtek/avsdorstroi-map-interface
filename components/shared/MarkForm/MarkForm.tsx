@@ -176,7 +176,8 @@ const validateEmail = (email: string): boolean => {
 
 // Валидация номера телефона, никогда не писал регулярки, взято с инета
 const validatePhone = (phone: string): boolean => {
-  return /^\+\d{11}$/.test(phone.trim())
+  if (phone === '') return true // Пустое поле допустимо
+  return /^\+\d{11}$/.test(phone)
 }
 
   // Обработчик отправки формы
@@ -286,7 +287,7 @@ const validatePhone = (phone: string): boolean => {
             <div className={styles.formFooter}>
               {/* Кнопка сохранения */}
               <Button
-                variant="primary"
+                
                 disabled={!isValidCoords || !hasUnsavedChanges} // Блокировка при невалидных данных или отсутствии изменений
                 onClick={handleSubmit}
                 className={styles.saveButton}

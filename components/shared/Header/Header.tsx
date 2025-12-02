@@ -43,9 +43,6 @@ export const Header: React.FC = () => {
       <button
         className={styles.simpleThemeToggle}
         onClick={toggleTheme}
-        aria-label={
-          isDarkTheme ? 'Включить светлую тему' : 'Включить темную тему'
-        }
       >
         {isDarkTheme ? (
           // Иконка солнца для светлой темы

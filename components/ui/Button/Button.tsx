@@ -3,7 +3,6 @@ import styles from './Button.module.scss'
 interface ButtonProps {
   children: React.ReactNode
   onClick?: () => void
-  variant?: 'primary' | 'secondary' | 'outline'
   disabled?: boolean
   className?: string
   type?: 'button' | 'submit' | 'reset'
@@ -13,9 +12,7 @@ interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
-  variant = 'primary',
   disabled = false,
-  className = '',
   type = 'button',
   title,
 }) => {
@@ -24,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${styles.button}  ${className}`}
+      className={styles.button}
       title={title}
     >
       {children}

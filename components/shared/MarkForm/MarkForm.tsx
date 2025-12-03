@@ -1,9 +1,10 @@
 'use client'
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import styles from './MarkForm.module.scss'
-import { Input } from '@/components/ui/Input/Input'
-import { Container } from '@/components/ui/Container/Container'
-import { Button } from '@/components/ui/Button/Button'
+import { Input } from '@/components/ui'
+import { Container } from '@/components/ui'
+import { Button } from '@/components/ui'
+import { MarkFormData } from '../types/FormData'
 import dynamic from 'next/dynamic'
 // Библиотеке leaflet требуется доступ к глобальному объекту window, 
 // поэтому отключили рендер на сервере
@@ -12,7 +13,7 @@ const MapComponent = dynamic(() => import('../MapComponent/MapComponent'), {
 })
 
 // Интерфейс пропсов компонента
-interface Props {
+interface InitialMarkFormData {
   initialData?: { // Начальные данные формы
     name: string
     latitude: number
@@ -22,23 +23,12 @@ interface Props {
     workingHours: string
     companyName: string
   }
-  onSave?: (data: FormData) => void // Колбэк при сохранении
+  onSave?: (data: MarkFormData) => void // Колбэк при сохранении
   onLocationChange?: (lat: number, lng: number) => void // Колбэк при изменении местоположения
 }
 
-// Интерфейс данных формы
-interface FormData {
-  name: string
-  latitude: string // Хранится как строка для удобства редактирования
-  longitude: string
-  email: string
-  phone: string
-  workingHours: string
-  companyName: string
-}
-
 // Экспорт компонента формы маркера
-export const MarkForm: React.FC<Props> = ({
+export const MarkForm: React.FC<InitialMarkFormData> = ({
   initialData = { // Значения по умолчанию для начальных данных
     name: '',
     latitude: 58.002407, // Координаты по умолчанию (Пермь)
@@ -66,7 +56,7 @@ export const MarkForm: React.FC<Props> = ({
   )
 
   // Состояние данных формы
-  const [formData, setFormData] = useState<FormData>(initialFormData)
+  const [formData, setFormData] = useState<MarkFormData>(initialFormData)
   
   // Состояние позиции маркера на карте [широта, долгота]
   const [markerPosition, setMarkerPosition] = useState<[number, number]>([
@@ -93,7 +83,7 @@ export const MarkForm: React.FC<Props> = ({
 
   // Обработчик изменения полей ввода
   const handleInputChange = useCallback(
-    (field: keyof FormData, value: string) => {
+    (field: keyof MarkFormData, value: string) => {
       const newFormData = {
         ...formData, // Копия текущих данных
         [field]: value, // Обновление конкретного поля

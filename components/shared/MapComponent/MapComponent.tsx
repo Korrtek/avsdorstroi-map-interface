@@ -1,7 +1,9 @@
+'use client'
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import styles from './MapComponent.module.scss'
+
 
 //  Пути к иконкам через опции иконки взяты с CDN самой библы
 L.Icon.Default.mergeOptions({

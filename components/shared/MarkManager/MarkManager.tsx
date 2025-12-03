@@ -1,10 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Container } from '@/components/ui/Container/Container'
-import { SearchInput } from '../SearchInput/SearchInput' 
-import { CreateMarkButton } from '../CreateMarkButton/CreateMarkButton' 
-import { MarkPreset } from '../MarkPreset/MarkPreset' 
-import { ClearMarksButton } from '../ClearMarksButton/ClearMarksButton'
+import { Container } from '@/components/ui'
+import { SearchInput } from '@/components/shared' 
+import { CreateMarkButton } from '@/components/shared' 
+import { MarkPreset } from '@/components/shared'
+import { ClearMarksButton } from '@/components/shared'
 import styles from './MarkManager.module.scss'
 
 interface Props {

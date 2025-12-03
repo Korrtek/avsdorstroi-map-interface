@@ -1,8 +1,10 @@
 'use client'
 import styles from './page.module.scss'
-import { MarkManager } from '@/components/shared/MarkManager/MarkManager'
-import { MarkForm } from '@/components/shared/MarkForm/MarkForm'
+import { MarkManager } from '@/components/shared'
+import { MarkForm } from '@/components/shared'
 import { useState, useEffect } from 'react'
+import { MarkFormData } from '@/components/shared/types/FormData'
+
 interface MarkData {
   id: string
   title: string
@@ -134,8 +136,8 @@ export default function Home() {
 
 
 
-  // Сохранение данных из формы
-  const handleSaveMark = (formData: any) => {
+  // Сохранение данных из формы по кнопке 
+  const handleSaveMark = (formData: MarkFormData) => {
     if (activeMarkId) {
       handleUpdateMark(activeMarkId, {
         name: formData.name,
@@ -154,6 +156,8 @@ export default function Home() {
     }
   }
 
+
+  // Очистка всех меток
     const handleClearAllMarks = () => {
     // Запрашиваем подтверждение у пользователя
     const isConfirmed = window.confirm('Удалить все метки?')
@@ -165,13 +169,6 @@ export default function Home() {
     setMarks([])
     setActiveMarkId(null)
   }
-
-
-
-
-
-
-
 
   return (
     <div>

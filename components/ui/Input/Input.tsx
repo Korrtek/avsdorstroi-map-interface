@@ -19,7 +19,7 @@ export const Input: React.FC<Props> = ({
   error
 }) => {
   return (
-    <div className={styles.inputWrapper}>
+                <div className={`${styles.inputWrapper} ${error? styles.hasError : ''}`}>
        <div className={styles.labelContainer}>
         {label && <div className={styles.label}>{label}</div>}
         {error && <div className={styles.error}>{error}</div>}

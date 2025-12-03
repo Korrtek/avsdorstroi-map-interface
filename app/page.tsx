@@ -43,6 +43,7 @@ const saveMarksToStorage = (marks: MarkData[]) => {
 }
 
 export default function Home() {
+  
   const [marks, setMarks] = useState<MarkData[]>([])
   const [activeMarkId, setActiveMarkId] = useState<string | null>(null)
 

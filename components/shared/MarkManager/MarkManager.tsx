@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { Container } from '@/components/ui'
 import { SearchInput } from '@/components/shared' 
 import { CreateMarkButton } from '@/components/shared' 
@@ -35,23 +35,19 @@ export const MarkManager: React.FC<Props> = ({
   onClearAllMarks
 }) => {
   const [searchQuery, setSearchQuery] = useState('')
-  const [filteredMarks, setFilteredMarks] = useState(marks)
 
-  // Фильтрация меток при изменении поискового запроса или marks
-  useEffect(() => {
+  // 
+  const filteredMarks = useMemo(() => {
     if (!searchQuery.trim()) {
-      setFilteredMarks(marks)
-      return
+      return marks
     }
 
     const query = searchQuery.toLowerCase().trim()
-    const filtered = marks.filter(
+    return marks.filter(
       (mark) =>
         mark.title.toLowerCase().includes(query) ||
-        mark.id.toLowerCase().includes(query),
+        mark.id.toLowerCase().includes(query)
     )
-
-    setFilteredMarks(filtered)
   }, [searchQuery, marks])
 
   const handleSearchChange = (value: string) => {

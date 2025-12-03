@@ -51,7 +51,7 @@ export const MarkForm: React.FC<Props> = ({
   onLocationChange, // Колбэк изменения локации
   onSave, // Колбэк сохранения
 }) => {
-  // Мемоизация начальных данных формы
+  // Мемоизация начальных данных формы, не дописал функционал мемоизации, доделать позже
   const initialFormData = useMemo(
     () => ({
       name: initialData.name,

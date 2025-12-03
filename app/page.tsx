@@ -14,7 +14,7 @@ interface MarkData {
   workingHours: string
   companyName: string
 }
-
+// По этому ключу будет сохраняться форма в localStorage
 const STORAGE_KEY = 'map-marks-data'
 
 const loadMarksFromStorage = (): MarkData[] => {
@@ -149,6 +149,25 @@ export default function Home() {
     }
   }
 
+    const handleClearAllMarks = () => {
+    // Запрашиваем подтверждение у пользователя
+    const isConfirmed = window.confirm('Удалить все метки?')
+    
+    if (!isConfirmed) {
+      return
+    }
+    localStorage.removeItem(STORAGE_KEY)
+    setMarks([])
+    setActiveMarkId(null)
+  }
+
+
+
+
+
+
+
+
   return (
     <div>
       {/* <Header/> */}
@@ -163,7 +182,8 @@ export default function Home() {
           onMarkClick={setActiveMarkId}
           onCreateMark={handleCreateMark}
           onDeleteMark={handleDeleteMark}
-          onMarkTitleChange={handleMarkTitleChange} // Передаем обработчик
+          onMarkTitleChange={handleMarkTitleChange} 
+          onClearAllMarks={handleClearAllMarks}
         />
 
         {activeMark && (
@@ -177,8 +197,10 @@ export default function Home() {
               phone: activeMark.phone,
               workingHours: activeMark.workingHours,
               companyName: activeMark.companyName,
+              
             }}
             onSave={handleSaveMark}
+            
             onLocationChange={(lat, lng) => {
               if (activeMarkId) {
                 handleUpdateMark(activeMarkId, {
@@ -189,7 +211,7 @@ export default function Home() {
             }}
           />
         )}
-
+      {/* Если нет пресетов рендерится */}
         {marks.length === 0 && (
           <div className={styles.emptyState}>
             <p>Нет сохраненных меток Создайте первую метку</p>

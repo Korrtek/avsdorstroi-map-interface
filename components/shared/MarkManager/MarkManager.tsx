@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/Container/Container'
 import { SearchInput } from '../SearchInput/SearchInput' 
 import { CreateMarkButton } from '../CreateMarkButton/CreateMarkButton' 
 import { MarkPreset } from '../MarkPreset/MarkPreset' 
+import { ClearMarksButton } from '../ClearMarksButton/ClearMarksButton'
 import styles from './MarkManager.module.scss'
 
 interface Props {
@@ -19,10 +20,11 @@ interface Props {
   onCreateMark: () => void
   onDeleteMark: (id: string) => void
   onMarkTitleChange?: (id: string, newTitle: string) => void
+  onClearAllMarks?: () => void
 }
 
 export const MarkManager: React.FC<Props> = ({
-  className,
+  
   placeholder = 'Поиск по названию',
   marks,
   activeMarkId,
@@ -30,6 +32,7 @@ export const MarkManager: React.FC<Props> = ({
   onCreateMark,
   onDeleteMark,
   onMarkTitleChange,
+  onClearAllMarks
 }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredMarks, setFilteredMarks] = useState(marks)
@@ -60,20 +63,26 @@ export const MarkManager: React.FC<Props> = ({
 
   return (
     <Container>
-      <div className={`${styles.markManager} ${className || ''}`}>
+      <div className={styles.markManagerWrapper}>
+
+      
+      <div className={styles.markManager }>
         {/* Передаем обработчик поиска */}
+        {marks.length > 0 &&(
         <SearchInput
           placeholder={placeholder}
           value={searchQuery}
           onChange={handleSearchChange}
         />
+      )}
+        
 
         <CreateMarkButton onClick={onCreateMark} />
 
         {/* Сообщение, если нет результатов поиска */}
         {noResults && (
           <div className={styles.noResults}>
-            <p>Не найдена метка по запросу: "{searchQuery}"</p>
+            <p>Не найдена метка по запросу: {searchQuery}</p>
           </div>
         )}
         <div className={styles.markPresetWrapper}>
@@ -91,6 +100,10 @@ export const MarkManager: React.FC<Props> = ({
             />
           ))}
         </div>
+      </div>
+      {marks.length > 0 &&(
+        <ClearMarksButton onClick={onClearAllMarks}/>
+      )}
       </div>
     </Container>
   )

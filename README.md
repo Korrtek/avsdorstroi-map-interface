@@ -1,9 +1,7 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Для просмотра посетите https://avsdoorstoi-map.netlify.app/
 Начало работы
-
 Сначала запустите сервер разработки:
-
 ```bash
 npm run dev
 # or
@@ -14,4 +12,3 @@ pnpm dev
 bun dev
 ```
 Откройте http://localhost:3000 в браузере, чтобы увидеть результат.
-Для просмотра посетите https://avsdoorstoi-map.netlify.app/

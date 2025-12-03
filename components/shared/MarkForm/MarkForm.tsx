@@ -148,31 +148,12 @@ export const MarkForm: React.FC<Props> = ({
 
 //Валидация Email
 const validateEmail = (email: string): boolean => {
-    if (email === '') return true // Пустое поле допустимо
-    
-    // 1. Проверка наличие символа @
-    const atIndex = email.indexOf('@')
-    if (atIndex <= 0) return false // @ должен быть не в начале
-    
-    // 2. Проверка на локальную часть и домен
-    const localPart = email.substring(0, atIndex)
-    const domain = email.substring(atIndex + 1)
-    
-    // 3. Проверка что локальная часть не пустая
-    if (localPart.length === 0) return false
-    
-    // 4. Проверка что домен не пустой и содержит точку
-    if (domain.length === 0) return false
-    const dotIndex = domain.indexOf('.')
-    if (dotIndex <= 0) return false // Точка не должна быть в начале домена
-    
-    // 5. Проверка что после последней точки есть хотя бы 2 символа
-    const lastDotIndex = domain.lastIndexOf('.')
-    if (lastDotIndex === -1) return false
-    if (domain.length - lastDotIndex - 1 < 2) return false // Должно быть минимум 2 символа после последней точки
-    
-    return true
-  }
+  if (email === '') return true // Пустое поле допустимо
+  
+  // Поддержка латинских и русских букв
+  const emailRegex = /^[a-zA-Zа-яА-Я0-9._%+-]+@[a-zA-Zа-яА-Я0-9.-]+\.[a-zA-Zа-яА-Я]{2,}$/
+  return emailRegex.test(email)
+}
 
 // Валидация номера телефона, никогда не писал регулярки, взято с инета
 const validatePhone = (phone: string): boolean => {
